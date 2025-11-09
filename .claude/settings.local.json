@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(specify init:*)",
+      "Bash($env:PYTHONIOENCODING='utf-8')",
+      "Bash(specify --help:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:speckit.org)",
+      "WebFetch(domain:deepwiki.com)",
+      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
