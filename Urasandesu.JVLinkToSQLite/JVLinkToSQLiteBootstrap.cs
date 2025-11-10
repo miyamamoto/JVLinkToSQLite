@@ -23,6 +23,7 @@
 // additional permission to convey the resulting work.
 
 using System;
+using Urasandesu.JVLinkToSQLite.DatabaseProviders;
 using Urasandesu.JVLinkToSQLite.Settings;
 
 namespace Urasandesu.JVLinkToSQLite
@@ -39,6 +40,7 @@ namespace Urasandesu.JVLinkToSQLite
         public class LoadSettingParameter
         {
             public string SettingXmlPath { get; set; }
+            public string DatabaseType { get; set; }
             public string SQLiteDataSource { get; set; }
             public int SQLiteThrottleSize { get; set; }
         }
@@ -67,8 +69,30 @@ namespace Urasandesu.JVLinkToSQLite
                 }
             }
 
+            // Create database provider based on type or auto-detect
+            IDatabaseProvider databaseProvider;
+            if (!string.IsNullOrEmpty(param.DatabaseType))
+            {
+                // Explicit database type specified
+                DatabaseType dbType;
+                if (!Enum.TryParse(param.DatabaseType, true, out dbType))
+                {
+                    throw new ArgumentException($"Invalid database type: {param.DatabaseType}. Valid values: sqlite, duckdb, postgresql", nameof(param));
+                }
+                databaseProvider = DatabaseProviderFactory.Create(dbType, param.SQLiteDataSource);
+            }
+            else
+            {
+                // Auto-detect from connection string
+                databaseProvider = DatabaseProviderFactory.CreateFromConnectionString(param.SQLiteDataSource);
+            }
+
+            // Maintain backward compatibility with SQLiteConnectionInfo
             var connInfo = new SQLiteConnectionInfo(param.SQLiteDataSource, param.SQLiteThrottleSize);
             setting.FillWithSQLiteConnectionInfo(connInfo);
+
+            // Store database provider in setting
+            setting.FillWithDatabaseProvider(databaseProvider);
 
             return setting;
         }

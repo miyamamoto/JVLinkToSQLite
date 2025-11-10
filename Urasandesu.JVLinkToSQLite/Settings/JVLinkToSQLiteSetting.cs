@@ -25,6 +25,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using Urasandesu.JVLinkToSQLite.DatabaseProviders;
 using Urasandesu.JVLinkToSQLite.JVLinkWrappers;
 
 namespace Urasandesu.JVLinkToSQLite.Settings
@@ -144,6 +145,12 @@ namespace Urasandesu.JVLinkToSQLite.Settings
         [XmlIgnore]
         public SQLiteConnectionInfo SQLiteConnectionInfo { get; private set; }
 
+        /// <summary>
+        /// データベース プロバイダーを取得します。
+        /// </summary>
+        [XmlIgnore]
+        public IDatabaseProvider DatabaseProvider { get; private set; }
+
         internal void FillWithSQLiteConnectionInfo(SQLiteConnectionInfo connInfo)
         {
             SQLiteConnectionInfo = connInfo;
@@ -156,6 +163,21 @@ namespace Urasandesu.JVLinkToSQLite.Settings
             foreach (var detail in Details)
             {
                 detail?.FillWithSQLiteConnectionInfo(connInfo);
+            }
+        }
+
+        internal void FillWithDatabaseProvider(IDatabaseProvider provider)
+        {
+            DatabaseProvider = provider;
+
+            if (Details == null)
+            {
+                return;
+            }
+
+            foreach (var detail in Details)
+            {
+                detail?.FillWithDatabaseProvider(provider);
             }
         }
     }

@@ -27,11 +27,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Urasandesu.JVLinkToSQLite.Basis.Mixins.System;
 using Urasandesu.JVLinkToSQLite.Basis.Mixins.System.Data;
+using Urasandesu.JVLinkToSQLite.DatabaseProviders;
 
 namespace Urasandesu.JVLinkToSQLite.JVLinkWrappers.DataBridges
 {
     public abstract class DataBridge
     {
+        /// <summary>
+        /// SQL ジェネレーター。データベース固有の SQL を生成します。
+        /// </summary>
+        public ISqlGenerator SqlGenerator { get; internal set; }
         public JVOpenOptions OpenOption { get; private set; }
         public string TableName { get; protected set; }
         public IReadOnlyList<BridgeColumn> Columns { get; protected set; }
