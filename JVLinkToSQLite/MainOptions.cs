@@ -39,8 +39,19 @@ namespace JVLinkToSQLite
             "* " + nameof(Modes.DefaultSetting))]
         public Modes Mode { get; set; }
 
+        [Option("dbtype", Required = false, HelpText =
+            "データベースタイプ。以下のパターンを指定可能です：\n" +
+            "* sqlite (デフォルト)\n" +
+            "* duckdb\n" +
+            "* postgresql\n" +
+            "省略時はファイル拡張子または接続文字列形式から自動検出します。")]
+        public string DatabaseType { get; set; }
+
         [Option('d', "datasource", Default = @"race.db", HelpText =
-            "データ ソース。SQLite ファイルのパスを指定します。")]
+            "データ ソース。データベースファイルのパスまたは接続文字列を指定します。\n" +
+            "* SQLite: race.db\n" +
+            "* DuckDB: race.duckdb\n" +
+            "* PostgreSQL: Server=localhost;Database=jvdata;Username=user")]
         public string DataSource { get; set; }
 
         [Option('t', "throttlesize", Default = 100, HelpText =
@@ -67,6 +78,7 @@ namespace JVLinkToSQLite
             return new JVLinkToSQLiteBootstrap.LoadSettingParameter
             {
                 SettingXmlPath = Setting,
+                DatabaseType = DatabaseType,
                 SQLiteDataSource = DataSource,
                 SQLiteThrottleSize = ThrottleSize
             };

@@ -23,6 +23,7 @@
 // additional permission to convey the resulting work.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Urasandesu.JVLinkToSQLite.JVLinkWrappers.DataBridges
@@ -37,12 +38,71 @@ namespace Urasandesu.JVLinkToSQLite.JVLinkWrappers.DataBridges
                 var lines = typeDescription.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 tableComment = $"  -- {string.Join("\r\n  -- ", lines.Take(lines.Length - 1))}\r\n"; // 最後の要素は「レコード区切」なので除去
             }
-            return $"create table if not exists {TableNamePlaceHolder} (\r\n" +
-                   tableComment + 
+
+            var createTableSql = $"create table if not exists {TableNamePlaceHolder} (\r\n" +
+                   tableComment +
                    $"  {string.Join("\r\n  , ", c.Value.Select(_ => _.ColumnName + " " + _.SqlColumnType + (_.IsId ? " not null" : string.Empty) + $" -- {_.ColumnComment}"))}\r\n" +
                    $"  {(c.Value.Any(_ => _.IsId) ? ", primary key (" + string.Join(",", c.Value.Where(_ => _.IsId).Select(_ => _.ColumnName)) + ")" : string.Empty)}" +
                    $")";
+
+            // インデックスの追加
+            var indexStatements = GenerateIndexStatements(c);
+            if (!string.IsNullOrEmpty(indexStatements))
+            {
+                createTableSql += ";\r\n" + indexStatements;
+            }
+
+            return createTableSql;
         }
+
+        /// <summary>
+        /// テーブルに対するインデックス作成SQL文を生成します
+        /// パターンマッチングにより、外部キー、日付カラム、重要カラムを自動検出してインデックスを作成します。
+        /// HashSetで重複を防止します。
+        /// </summary>
+        private static string GenerateIndexStatements(JVDataStructColumns c)
+        {
+            // 重複を防止するためHashSetを使用
+            var indexedColumns = new HashSet<string>();
+            var statements = new List<string>();
+
+            foreach (var column in c.Value.Where(_ => !_.IsId)) // PRIMARY KEYは除外
+            {
+                var columnName = column.ColumnName.ToLower();
+
+                // 既にインデックス化されている場合はスキップ
+                if (indexedColumns.Contains(columnName))
+                    continue;
+
+                bool shouldIndex = false;
+
+                // 外部キーと思われるカラム（_id, _codeで終わる）
+                // より厳密な判定: "_id"または"_code"で終わる場合のみ
+                if (columnName.EndsWith("_id") || columnName.EndsWith("_code"))
+                {
+                    shouldIndex = true;
+                }
+                // 日付カラム（dateまたはtimeを含む）
+                else if (columnName.Contains("date") || columnName.Contains("time"))
+                {
+                    shouldIndex = true;
+                }
+                // 頻繁に検索されるカラム
+                else if (columnName == "sex" || columnName == "affiliation" || columnName == "distance")
+                {
+                    shouldIndex = true;
+                }
+
+                if (shouldIndex)
+                {
+                    statements.Add($"create index if not exists idx_{column.ColumnName} on {TableNamePlaceHolder}({column.ColumnName})");
+                    indexedColumns.Add(columnName);
+                }
+            }
+
+            return string.Join(";\r\n", statements);
+        }
+
         private JVDataStructCreateTableSources() { }
     }
 }

@@ -94,6 +94,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseProviders\DatabaseProviderFactoryTests.cs" />
+    <Compile Include="DatabaseProviders\AutoDetectionTests.cs" />
+    <Compile Include="DatabaseProviders\IndexAnalysisTests.cs" />
+    <Compile Include="DatabaseProviders\IndexGenerationTests.cs" />
+    <Compile Include="DatabaseProviders\SQLite\SQLiteDatabaseProviderTests.cs" />
+    <Compile Include="DatabaseProviders\SQLite\SQLiteSqlGeneratorTests.cs" />
+    <Compile Include="DatabaseProviders\DuckDB\DuckDBDatabaseProviderTests.cs" />
+    <Compile Include="DatabaseProviders\DuckDB\DuckDBSqlGeneratorTests.cs" />
+    <Compile Include="DatabaseProviders\PostgreSQL\PostgreSQLDatabaseProviderTests.cs" />
+    <Compile Include="DatabaseProviders\PostgreSQL\PostgreSQLSqlGeneratorTests.cs" />
+    <Compile Include="ErrorHandling\DatabaseErrorTests.cs" />
+    <Compile Include="Integration\ComprehensiveAllTablesTests.cs" />
+    <Compile Include="Integration\CrossDatabaseDataComparisonTests.cs" />
     <Compile Include="DocGen\TableSpecGenerator.cs" />
     <Compile Include="JVLinkWrappers\IIntervalDivisibleDataSpecKeyMixinTest.cs" />
     <Compile Include="MarshalByRefRunner.cs" />

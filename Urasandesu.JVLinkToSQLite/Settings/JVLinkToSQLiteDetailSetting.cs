@@ -25,6 +25,7 @@
 using DryIoc;
 using System;
 using System.Xml.Serialization;
+using Urasandesu.JVLinkToSQLite.DatabaseProviders;
 using Urasandesu.JVLinkToSQLite.OperatorAggregates;
 
 namespace Urasandesu.JVLinkToSQLite.Settings
@@ -51,9 +52,20 @@ namespace Urasandesu.JVLinkToSQLite.Settings
         [XmlIgnore]
         public SQLiteConnectionInfo SQLiteConnectionInfo { get; private set; }
 
+        /// <summary>
+        /// データベース プロバイダーを取得します。
+        /// </summary>
+        [XmlIgnore]
+        public IDatabaseProvider DatabaseProvider { get; private set; }
+
         internal void FillWithSQLiteConnectionInfo(SQLiteConnectionInfo connInfo)
         {
             SQLiteConnectionInfo = connInfo;
+        }
+
+        internal void FillWithDatabaseProvider(IDatabaseProvider provider)
+        {
+            DatabaseProvider = provider;
         }
 
         public virtual JVOperatorAggregate NewOperatorAggregate(IResolver resolver, bool isImmediate)
